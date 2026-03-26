@@ -162,19 +162,28 @@ Second time: "Sign into Upwork" → replay from memory → $0.00
 Ghost works with any vision or text LLM through OpenRouter:
 
 ```python
-# Claude
-ghost = Ghost(model="anthropic/claude-sonnet-4")
+# Claude Sonnet 4.6 (recommended — best balance of speed + quality)
+ghost = Ghost(model="anthropic/claude-sonnet-4-6")
 
-# GPT-4o
+# Claude Opus 4.6 (most capable)
+ghost = Ghost(model="anthropic/claude-opus-4-6")
+
+# GPT-4.6 (OpenAI latest)
+ghost = Ghost(model="openai/gpt-4.6")
+
+# GPT-4o (fast, cheaper)
 ghost = Ghost(model="openai/gpt-4o")
 
-# Gemini
+# Gemini 3.1 Pro (Google latest)
+ghost = Ghost(model="google/gemini-3.1-pro")
+
+# Gemini 2.5 Flash (cheapest, still good)
 ghost = Ghost(model="google/gemini-2.5-flash")
 
-# Llama (cheap)
+# Llama 4 Maverick (open source)
 ghost = Ghost(model="meta-llama/llama-4-maverick")
 
-# Any OpenRouter model
+# Any model on OpenRouter works
 ghost = Ghost(model="your-preferred-model")
 ```
 
