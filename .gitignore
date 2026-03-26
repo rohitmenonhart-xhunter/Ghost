@@ -1,0 +1,37 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Checkpoints (too large for git)
+checkpoints/
+*.pt
+*.bin
+*.safetensors
+*.gguf
+
+# Data
+data/*.parquet
+data/*.arrow
+data/*.json
+data/images/
+
+# Environment
+.env
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+wandb/
+*.log
