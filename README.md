@@ -1,6 +1,19 @@
-# Ghost
+<p align="center">
+  <img src="assets/logo.png" alt="Ghost" width="150">
+</p>
 
-**AI browser agent that costs 50x less.** DOM + OCR + Memory. Works with any LLM.
+<h1 align="center">Ghost</h1>
+
+<p align="center">
+  <strong>AI browser agent that costs 50x less.</strong><br>
+  DOM + OCR + Memory. Works with any LLM.
+</p>
+
+<p align="center">
+  <a href="https://pypi.org/project/ghostagent/"><img src="https://img.shields.io/pypi/v/ghostagent?color=red" alt="PyPI"></a>
+  <a href="https://github.com/rohitmenonhart-xhunter/Ghost/stargazers"><img src="https://img.shields.io/github/stars/rohitmenonhart-xhunter/Ghost?style=social" alt="Stars"></a>
+  <a href="https://github.com/rohitmenonhart-xhunter/Ghost/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
+</p>
 
 Ghost reads the browser's DOM as structured text instead of sending screenshots to a vision model. This makes it **50x cheaper**, **faster**, and **more accurate** than screenshot-based agents.
 
