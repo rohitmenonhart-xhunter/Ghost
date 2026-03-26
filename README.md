@@ -41,7 +41,7 @@ Ghost:              DOM elements → text list → LLM picks ID → exact click
 ### Install
 
 ```bash
-pip install ghost-agent
+pip install ghostagent
 ```
 
 ### Set your API key
