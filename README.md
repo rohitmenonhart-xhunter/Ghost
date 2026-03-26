@@ -4,7 +4,7 @@
 
 Ghost reads the browser's DOM as structured text instead of sending screenshots to a vision model. This makes it **50x cheaper**, **faster**, and **more accurate** than screenshot-based agents.
 
-```python
+```bash
 pip install ghostagent
 ```
 
@@ -22,19 +22,15 @@ print(result)
 
 Every other browser agent sends a **2 million pixel screenshot** to a vision model for every single action. Ghost reads the **DOM as text** — same information, 50x cheaper.
 
-| | Screenshot agents (Claude CU, OpenAI CUA, Browser Use) | **Ghost** |
-|---|---|---|
-| **How it sees** | Sends full screenshot to VLM | Reads DOM as text (~200 tokens) |
-| **Cost per action** | $0.01-0.05 | **$0.0003** |
-| **Cost per task** | $0.10-5.00 | **$0.003** |
-| **Browser accuracy** | ~85% (pixel guessing) | **~99% (exact DOM selectors)** |
-| **Speed per action** | 3-10 seconds | **1-2 seconds** |
-| **Memory** | None | **Persistent — learns from past tasks** |
-| **LLM lock-in** | Specific model required | **Any LLM via OpenRouter** |
+![Cost Comparison](assets/cost_comparison.png)
+
+![Accuracy Comparison](assets/accuracy_comparison.png)
 
 ---
 
 ## How It Works
+
+![How Ghost Works](assets/how_it_works.png)
 
 ```
 Them:   Screenshot → Vision LLM ($$$) → guess coordinates → click → repeat
@@ -47,13 +43,11 @@ Ghost:  Read DOM elements → text list → LLM picks element ID → exact click
 
 ### Three perception layers, cheapest first
 
-| Layer | When Ghost uses it | Tokens | Accuracy |
-|-------|-------------------|--------|----------|
-| **DOM** (Chrome DevTools) | Default for all browser pages | ~200 | ~99% |
-| **OCR** (RapidOCR) | Popups, OAuth dialogs, file pickers | ~300 | ~95% |
-| **VLM** (any vision model) | Only when DOM + OCR both fail | ~3000 | ~85% |
+![Perception Layers](assets/perception_layers.png)
 
-Ghost uses DOM 90% of the time. VLM is the last resort, not the first.
+Ghost uses DOM **90% of the time**. VLM is the last resort, not the first.
+
+![Token Usage](assets/token_usage.png)
 
 ---
 
@@ -147,7 +141,6 @@ ghost = Ghost(model="meta-llama/llama-4-maverick")
 
 ### Data extraction
 ```python
-# Scrape structured data from any website
 ghost.browse("Go to Y Combinator's top companies page and get the top 10 company names")
 ```
 
@@ -215,7 +208,9 @@ Second run:  "Sign into Upwork" → replay from memory → $0.000
 
 ## Benchmarks
 
-Tested on 57 OSWorld-style tasks across browser, file management, and multi-app categories:
+![Benchmark Results](assets/benchmarks.png)
+
+Tested on 57 OSWorld-style tasks:
 
 | Category | Ghost | Claude CU | OpenAI CUA |
 |----------|-------|-----------|------------|
@@ -227,7 +222,7 @@ Tested on 57 OSWorld-style tasks across browser, file management, and multi-app 
 
 ---
 
-## How Ghost compares to other browser agents
+## How Ghost compares
 
 | Agent | Approach | Cost/task | Accuracy | Memory | LLM choice |
 |-------|----------|-----------|----------|--------|------------|
@@ -285,3 +280,7 @@ Apache 2.0
 ## Contributing
 
 PRs welcome. Ghost is open source and built for the community.
+
+---
+
+Built by [Rohit Menon](https://github.com/rohitmenonhart-xhunter)
