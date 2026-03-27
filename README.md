@@ -51,6 +51,10 @@ Ghost walks you through setup on first run — enter your API key once, grant pe
 
 Every other browser agent sends **screenshots to a vision model** for every action. Ghost reads the **DOM as text** — same information, **50x cheaper, faster, more accurate.**
 
+![Accuracy vs Cost](assets/accuracy_vs_cost.png)
+
+Ghost is top-left: **highest accuracy, lowest cost.** Everyone else pays more and gets less.
+
 ![Cost Comparison](assets/cost_comparison.png)
 
 ![Accuracy Comparison](assets/accuracy_comparison.png)
