@@ -260,6 +260,34 @@ def main():
     console.print()
 
 
+def _get_terminal_app() -> str:
+    """Detect which terminal app the user is running Ghost from."""
+    import subprocess
+    # Check common terminal apps — the one that was frontmost before Chrome
+    for app in ["Terminal", "iTerm2", "iTerm", "Alacritty", "kitty", "Warp", "Code"]:
+        try:
+            result = subprocess.run(
+                ["osascript", "-e", f'tell application "System Events" to get (name of every process whose name is "{app}")'],
+                capture_output=True, text=True, timeout=3,
+            )
+            if app.lower() in result.stdout.lower():
+                return app
+        except Exception:
+            pass
+    return "Terminal"  # fallback
+
+
+def _bring_terminal_back(apps):
+    """Switch focus back to the terminal after task completion."""
+    import platform
+    if platform.system() == "Darwin":
+        terminal_app = _get_terminal_app()
+        apps.switch_to_app(terminal_app, fullscreen=False)
+    elif platform.system() == "Linux":
+        import subprocess
+        subprocess.run(["wmctrl", "-a", "terminal"], capture_output=True)
+
+
 def _run_single_task(console, agent, browser, apps, memory, api_key, model, user_input, task_num) -> Optional[str]:
     """Execute a single task and return a smart response."""
     from rich.panel import Panel
@@ -359,6 +387,9 @@ Give a clean, concise response to the user about what you did and what you found
         console.print("\n  [yellow]Task interrupted.[/yellow]")
     except Exception as e:
         console.print(f"  [red]Error: {e}[/red]")
+
+    # Bring terminal back to foreground so user sees the result
+    _bring_terminal_back(apps)
 
     return result_text
 
@@ -509,6 +540,9 @@ Use bullet points. Be specific."""}],
     console.print(f"  [dim]Summary saved to {summary_path}[/dim]")
     memory.log(f"Loop completed: {iteration} iterations for '{task[:50]}'")
     memory.remember(f"Loop task '{task[:40]}' ran {iteration} iterations")
+
+    # Bring terminal back so user sees the summary
+    _bring_terminal_back(apps)
 
 
 def cli_entry():
