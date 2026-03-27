@@ -27,21 +27,22 @@ dependencies = [
     "websocket-client>=1.6.0",
     "requests>=2.31.0",
     "rapidocr-onnxruntime>=1.2.0",
+    "rich>=13.0.0",
     "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
 anthropic = ["anthropic>=0.40.0"]
 desktop = ["pyobjc-framework-ApplicationServices>=10.0; sys_platform == 'darwin'"]
-all = ["ghost-agent[anthropic,desktop]"]
+all = ["ghostagent[anthropic,desktop]"]
 
 [project.urls]
-Homepage = "https://github.com/user/ghost-agent"
-Documentation = "https://github.com/user/ghost-agent#readme"
-Issues = "https://github.com/user/ghost-agent/issues"
+Homepage = "https://github.com/rohitmenonhart-xhunter/Ghost"
+Documentation = "https://github.com/rohitmenonhart-xhunter/Ghost#readme"
+Issues = "https://github.com/rohitmenonhart-xhunter/Ghost/issues"
 
 [project.scripts]
-ghost = "ghost.core.ghost:Ghost"
+ghost = "ghost.cli:cli_entry"
 
 [tool.setuptools.packages.find]
 include = ["ghost*"]

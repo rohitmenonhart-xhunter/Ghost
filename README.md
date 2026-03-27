@@ -5,8 +5,8 @@
 <h1 align="center">Ghost</h1>
 
 <p align="center">
-  <strong>AI browser agent that costs 50x less.</strong><br>
-  DOM + OCR + Memory. Works with any LLM.
+  <strong>AI browser agent that controls your computer.</strong><br>
+  Type a task. Ghost does it. DOM + OCR + Memory.
 </p>
 
 <p align="center">
@@ -15,25 +15,71 @@
   <a href="https://github.com/rohitmenonhart-xhunter/Ghost/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
 </p>
 
-Ghost reads the browser's DOM as structured text instead of sending screenshots to a vision model. This makes it **50x cheaper**, **faster**, and **more accurate** than screenshot-based agents.
+---
+
+## Install & Run
 
 ```bash
 pip install ghostagent
+export OPENROUTER_API_KEY="your-key-here"
+ghost
 ```
 
-```python
-from ghost import Ghost
-
-ghost = Ghost()
-result = ghost.browse("Go to Hacker News and get the top 5 stories")
-print(result)
 ```
+╔══════════════════════════════════════════╗
+║  👻 Ghost v0.2.0                         ║
+║  AI browser agent. DOM + OCR + Memory.   ║
+║  Type a task. Ghost does it.             ║
+╚══════════════════════════════════════════╝
+
+  Permissions
+    ◉ Browser Control    Open, navigate, click, type in Chrome
+    ◉ Screen Reading     Capture screenshots, read text via OCR
+    ◉ File System        Read/write files, manage downloads
+    ◉ Clipboard          Read/write system clipboard
+    ◉ App Management     Open, close, switch applications
+    ◉ Keyboard/Mouse     Click, type, scroll, hotkeys
+
+  Grant all permissions? [y/n]: y
+  ✓ All permissions granted.
+  ✓ Ghost is ready.
+
+  ghost> Sign into Upwork with Google using rohit@gmail.com
+    Step 1: NAVIGATE upwork.com/login
+    Step 2: CLICK "Continue with Google"
+    Step 3: CLICK "rohit@gmail.com"
+    ✓ Signed into Upwork
+
+  ghost> Go to HackerNews and get the top 5 stories
+    ✓ 1. Why so many control rooms were seafoam green
+      2. Show HN: I built a search engine for RSS feeds
+      3. ...
+
+  ghost> Convert my PDF at ~/Downloads/report.pdf to DOCX
+    Step 1: NAVIGATE cloudconvert.com
+    Step 2: CLICK "Select File"
+    [DIALOG] File picker detected → Downloads → report.pdf → Open
+    Step 3: CLICK "Convert"
+    Step 4: CLICK "Download"
+    ✓ Saved report.docx to Downloads
+
+  ghost> /quit
+  👻 Ghost vanishes...
+```
+
+---
+
+## What is Ghost?
+
+Ghost is a **terminal agent** — like Claude Code but for browser tasks. You type what you want, Ghost opens Chrome and does it on your real system with your real cookies, logins, and sessions.
+
+No sandboxed browser. No Playwright. No Selenium. Your actual Chrome.
 
 ---
 
 ## Why Ghost?
 
-Every other browser agent sends a **2 million pixel screenshot** to a vision model for every single action. Ghost reads the **DOM as text** — same information, 50x cheaper.
+Every other browser agent sends **screenshots to a vision model** for every action. Ghost reads the **DOM as text** — 50x cheaper, faster, more accurate.
 
 ![Cost Comparison](assets/cost_comparison.png)
 
@@ -46,11 +92,10 @@ Every other browser agent sends a **2 million pixel screenshot** to a vision mod
 ![How Ghost Works](assets/how_it_works.png)
 
 ```
-Them:   Screenshot → Vision LLM ($$$) → guess coordinates → click → repeat
+Them:   Screenshot → Vision LLM ($$$) → guess pixel coordinates → click
 
-Ghost:  Read DOM elements → text list → LLM picks element ID → exact click
-        + OCR catches popups, dialogs, overlays outside the DOM
-        + VLM only called when DOM + OCR can't solve it (rare)
+Ghost:  Read DOM as text → LLM picks element ID → exact click
+        + OCR catches popups, dialogs, overlays
         + Memory replays known tasks at zero cost
 ```
 
@@ -58,225 +103,136 @@ Ghost:  Read DOM elements → text list → LLM picks element ID → exact click
 
 ![Perception Layers](assets/perception_layers.png)
 
-Ghost uses DOM **90% of the time**. VLM is the last resort, not the first.
-
 ![Token Usage](assets/token_usage.png)
 
 ---
 
-## Quick Start
+## Commands
 
-### 1. Install
-
-```bash
-pip install ghostagent
-```
-
-### 2. Set your API key
-
-Ghost works with any LLM through [OpenRouter](https://openrouter.ai) — one API key, access to every model:
-
-```bash
-export OPENROUTER_API_KEY="your-key-here"
-```
-
-### 3. Use it
-
-```python
-from ghost import Ghost
-
-ghost = Ghost()
-
-# Browse and extract information
-result = ghost.browse("Go to wikipedia.org and get the first paragraph about Python")
-print(result)
-
-# Extract specific data from any page
-price = ghost.extract("https://example.com/product", "What is the price?")
-
-# Fill out forms
-ghost.fill("https://example.com/contact", {
-    "name": "Ghost Agent",
-    "email": "ghost@example.com",
-    "message": "Hello from Ghost!"
-}, submit=True)
-
-# Complex multi-step workflows
-ghost.browse("""
-    1. Go to google.com
-    2. Search for "best restaurants in NYC"
-    3. Get the top 3 results with their ratings
-    4. Save them to /tmp/restaurants.txt
-""")
-```
-
-### Context manager
-
-```python
-with Ghost() as ghost:
-    ghost.browse("Sign into my account on example.com")
-    data = ghost.extract("https://example.com/dashboard", "Get my account balance")
-# Browser closes automatically
-```
+| Command | What it does |
+|---------|-------------|
+| `ghost` | Start Ghost |
+| `/help` | Show all commands |
+| `/model [name]` | Switch LLM (e.g., `/model openai/gpt-4o`) |
+| `/memory` | Show what Ghost remembers |
+| `/tasks` | Show completed tasks |
+| `/tabs` | List open browser tabs |
+| `/screenshot` | Save current screen |
+| `/quit` | Exit |
+| **[anything else]** | **Ghost executes it as a task** |
 
 ---
 
 ## Use any LLM
 
-Ghost works with every major model through OpenRouter. Pick the one that fits your budget:
+Switch models on the fly inside Ghost:
 
-```python
-# Claude Sonnet 4.6 (recommended — best balance of speed + quality)
-ghost = Ghost(model="anthropic/claude-sonnet-4-6")
+```
+ghost> /model anthropic/claude-sonnet-4-6
+✓ Switched to claude-sonnet-4-6
 
-# Claude Opus 4.6 (most capable)
-ghost = Ghost(model="anthropic/claude-opus-4-6")
+ghost> /model openai/gpt-4.6
+✓ Switched to gpt-4.6
 
-# GPT-4.6 (OpenAI latest)
-ghost = Ghost(model="openai/gpt-4.6")
+ghost> /model google/gemini-3.1-pro
+✓ Switched to gemini-3.1-pro
 
-# GPT-4o (fast, cheaper)
-ghost = Ghost(model="openai/gpt-4o")
+ghost> /model google/gemini-2.5-flash
+✓ Switched to gemini-2.5-flash (cheapest)
+```
 
-# Gemini 3.1 Pro (Google latest)
-ghost = Ghost(model="google/gemini-3.1-pro")
+Works with every model on [OpenRouter](https://openrouter.ai).
 
-# Gemini 2.5 Flash (cheapest option, still accurate)
-ghost = Ghost(model="google/gemini-2.5-flash")
+---
 
-# Llama 4 Maverick (open source, run locally)
-ghost = Ghost(model="meta-llama/llama-4-maverick")
+## What Ghost can do
+
+**Data extraction**
+```
+ghost> Go to Y Combinator's top companies and get the top 10 names
+```
+
+**Form filling**
+```
+ghost> Go to example.com/signup and fill: name=Rohit, email=rohit@example.com
+```
+
+**Authenticated workflows** (uses your real Chrome cookies)
+```
+ghost> Go to my Gmail and find the latest email from Amazon
+```
+
+**File uploads & downloads**
+```
+ghost> Upload ~/Downloads/report.pdf to ilovepdf.com, convert to DOCX, download it
+```
+
+**Google sign-in flows**
+```
+ghost> Sign into Upwork with Google using rohit@gmail.com
+```
+
+**Multi-step research**
+```
+ghost> Search Google for "best AI agents 2026", get top 5 results, save to ~/research.txt
 ```
 
 ---
 
-## What can Ghost do?
+## Memory
 
-### Data extraction
-```python
-ghost.browse("Go to Y Combinator's top companies page and get the top 10 company names")
-```
-
-### Form filling & sign-ups
-```python
-ghost.fill("https://example.com/signup", {
-    "name": "Rohit",
-    "email": "rohit@example.com",
-    "company": "Ghost AI"
-}, submit=True)
-```
-
-### Authenticated workflows
-```python
-# Ghost uses your real Chrome with all your cookies and logins
-ghost.browse("Go to my Gmail and find the latest email from Amazon")
-```
-
-### File uploads & downloads
-```python
-# Ghost handles native file dialogs automatically via OCR
-ghost.browse("Go to ilovepdf.com, upload /Users/me/report.pdf, convert to DOCX, download it")
-```
-
-### Multi-tab workflows
-```python
-ghost.browse("""
-    1. Open tab 1: go to competitor-a.com and get their pricing
-    2. Open tab 2: go to competitor-b.com and get their pricing
-    3. Compare both and save the summary to /tmp/comparison.txt
-""")
-```
-
-### Google OAuth & sign-in flows
-```python
-# Handles Google sign-in popups (OAuth) via OCR detection
-ghost.browse("Go to upwork.com, sign in with Google using rohit@gmail.com")
-```
-
----
-
-## Memory System
-
-Ghost remembers across sessions. No other browser agent does this.
+Ghost remembers across sessions. Ask it something once, it never forgets.
 
 ```
-ghost_workspace/
-├── SOUL.md        → Agent personality and rules
-├── MEMORY.md      → Learned facts ("Upwork login uses Google OAuth")
-├── USER.md        → Your preferences
-└── memory/
-    └── 2026-03-27.md  → Today's activity log
+ghost> /memory
+┌─────────────────────────────────────────┐
+│ MEMORY.md                               │
+│                                         │
+│ - Upwork login uses Google OAuth        │
+│ - Safari icon is 5th in dock            │
+│ - User prefers Claude Sonnet 4.6        │
+└─────────────────────────────────────────┘
 ```
 
-### Task Replay — zero cost repeat tasks
-
-First time Ghost does a task, it records every step. Next time the same task comes up:
-
-```
-First run:   "Sign into Upwork" → 5 LLM calls → $0.003
-Second run:  "Sign into Upwork" → replay from memory → $0.000
-```
+**Task Replay**: First time costs $0.003. Second time costs $0.000.
 
 ---
 
 ## Benchmarks
 
-![Benchmark Results](assets/benchmarks.png)
+![Benchmarks](assets/benchmarks.png)
 
-Tested on 57 OSWorld-style tasks:
-
-| Category | Ghost | Claude CU | OpenAI CUA |
-|----------|-------|-----------|------------|
-| **Browser tasks** | **100%** | ~80% | ~70% |
-| **File management** | **100%** | ~60% | ~50% |
-| **Multi-app** | **100%** | ~50% | ~40% |
-| **Overall** | **87.7%** | ~72% | ~43% |
-| **Cost per task** | **$0.003** | $0.10 | $0.15 |
+| Agent | Approach | Cost/task | Accuracy | Memory |
+|-------|----------|-----------|----------|--------|
+| Claude Computer Use | Screenshots → VLM | $0.10-5.00 | ~85% | No |
+| OpenAI Operator | Screenshots → VLM | $0.10-5.00 | ~85% | No |
+| Browser Use | Playwright + LLM | $0.01-0.05 | ~89% | No |
+| **Ghost** | **DOM + OCR + text LLM** | **$0.003** | **~99%** | **Yes** |
 
 ---
 
-## How Ghost compares
+## Permissions
 
-| Agent | Approach | Cost/task | Accuracy | Memory | LLM choice |
-|-------|----------|-----------|----------|--------|------------|
-| **Claude Computer Use** | Screenshots → VLM | $0.10-5.00 | ~85% | No | Claude only |
-| **OpenAI Operator** | Screenshots → VLM | $0.10-5.00 | ~85% | No | GPT only |
-| **Browser Use** | Playwright + LLM | $0.01-0.05 | ~89% | No | Any |
-| **Skyvern** | Vision + extraction | $0.05-0.20 | ~80% | No | Limited |
-| **Ghost** | **DOM + OCR + text LLM** | **$0.003** | **~99%** | **Yes** | **Any** |
+When Ghost starts, it asks for permission to:
 
----
+| Permission | Why Ghost needs it |
+|-----------|-------------------|
+| **Browser Control** | Navigate, click, type in Chrome via DevTools Protocol |
+| **Screen Reading** | OCR for popups, dialogs, and overlays outside the DOM |
+| **File System** | Read/write files, handle downloads |
+| **Clipboard** | Copy/paste data between apps |
+| **App Management** | Open/close/fullscreen Chrome |
+| **Keyboard/Mouse** | Physical input when DOM clicks aren't enough |
 
-## Architecture
-
-```
-ghost/
-├── core/ghost.py          # Simple 3-line API
-├── browser/
-│   ├── cdp.py             # Chrome DevTools Protocol — reads DOM from your real browser
-│   ├── agent.py           # AI decision loop using DOM elements as text
-│   └── tabs.py            # Multi-tab management
-├── vision/
-│   ├── ocr.py             # RapidOCR — catches popups, dialogs, overlays
-│   ├── perceive.py        # Unified perception: DOM + OCR + VLM fallback
-│   └── vlm.py             # Vision LLM — only used when DOM + OCR fail
-├── agent/
-│   ├── file_dialog.py     # Native file picker handling via OCR
-│   ├── clipboard.py       # Copy/paste between apps
-│   ├── safety.py          # Confirms before destructive actions
-│   └── recovery.py        # Structured error recovery
-└── memory/
-    ├── memory.py           # SOUL.md + MEMORY.md + episodic logs
-    └── replay.py           # Task replay library
-```
+Ghost runs on **your machine**. Nothing is sent to any server except LLM API calls (your chosen provider).
 
 ---
 
 ## Requirements
 
 - Python 3.10+
-- Google Chrome installed
-- An LLM API key ([OpenRouter](https://openrouter.ai) recommended)
+- Google Chrome
+- [OpenRouter API key](https://openrouter.ai) (free to start)
 
 ## Install from source
 
@@ -284,15 +240,12 @@ ghost/
 git clone https://github.com/rohitmenonhart-xhunter/Ghost.git
 cd Ghost
 pip install -e .
+ghost
 ```
 
 ## License
 
 Apache 2.0
-
-## Contributing
-
-PRs welcome. Ghost is open source and built for the community.
 
 ---
 
