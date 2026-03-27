@@ -100,15 +100,11 @@ ghost> Convert ~/Downloads/report.pdf to DOCX
 
 ## How It Works
 
-![How Ghost Works](assets/how_it_works.png)
-
 Three perception layers — cheapest first, smartest always:
 
 ![Perception Layers](assets/perception_layers.png)
 
 DOM handles 90% of actions. VLM is the last resort, not the first.
-
-![Token Usage](assets/token_usage.png)
 
 ---
 
@@ -223,13 +219,7 @@ Three steps. Ghost handles everything else.
 ---
 
 <p align="center">
-  <img src="assets/logo.png" alt="Silver" width="80">
-</p>
-
-<h2 align="center">Introducing Silver Browser</h2>
-
-<p align="center">
-  <em>The browser built for AI. Open source. Coming soon.</em>
+  <img src="assets/silver_announcement.png" alt="Silver Browser" width="500">
 </p>
 
 Ghost is powerful — but it's controlling someone else's browser. **What if the browser itself was built for AI from the ground up?**
