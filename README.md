@@ -49,15 +49,20 @@ Ghost walks you through setup on first run — enter your API key once, grant pe
 
 ![Why Ghost](assets/infographic_why_ghost.png)
 
-Every other browser agent sends **screenshots to a vision model** for every action. Ghost reads the **DOM as text** — same information, **50x cheaper, faster, more accurate.**
+Ghost doesn't compete with Claude or GPT. **Ghost uses them.** The difference is the method:
+
+```
+Claude Computer Use:   Claude looks at screenshots → guesses where to click
+Ghost + Claude:        Claude reads DOM as text   → picks the exact element
+
+Same model. Better input. That's why Ghost is more accurate AND cheaper.
+```
 
 ![Accuracy vs Cost](assets/accuracy_vs_cost.png)
 
-Ghost is top-left: **highest accuracy, lowest cost.** Everyone else pays more and gets less.
+Any model performs better through Ghost's DOM method than through screenshot-based approaches. Ghost makes your LLM smarter by giving it structured data instead of raw pixels.
 
 ![Cost Comparison](assets/cost_comparison.png)
-
-![Accuracy Comparison](assets/accuracy_comparison.png)
 
 ---
 
