@@ -24,7 +24,7 @@ pip install ghostagent
 ghost
 ```
 
-Ghost walks you through setup on first run — enter your API key once, grant permissions, and you're ready.
+Ghost walks you through setup on first run — enter your API key once, grant permissions, done.
 
 ```
 ╔══════════════════════════════════════════╗
@@ -45,9 +45,19 @@ Ghost walks you through setup on first run — enter your API key once, grant pe
 
 ---
 
-## What is Ghost?
+## Why Ghost?
 
-Ghost is a **terminal agent** that controls your browser. Type what you want in plain English, Ghost opens Chrome and does it — on your real system, with your real cookies, logins, and sessions.
+![Why Ghost](assets/infographic_why_ghost.png)
+
+Every other browser agent sends **screenshots to a vision model** for every action. Ghost reads the **DOM as text** — same information, **50x cheaper, faster, more accurate.**
+
+![Cost Comparison](assets/cost_comparison.png)
+
+![Accuracy Comparison](assets/accuracy_comparison.png)
+
+---
+
+## See It In Action
 
 ```
 ghost> Sign into Upwork with Google using rohit@gmail.com
@@ -67,12 +77,11 @@ ghost> Get the top 5 trending repos on GitHub with star counts
   │ • Yeachan-Heo/oh-my-claudecode — 13,001 ⭐          │
   ╰─────────────────────────────────────────────────────╯
 
-ghost> Convert ~/Downloads/report.pdf to DOCX using an online converter
+ghost> Convert ~/Downloads/report.pdf to DOCX
   Step 1: NAVIGATE cloudconvert.com
   Step 2: CLICK "Select File"
   [DIALOG] File picker → Downloads → report.pdf → Open
-  Step 3: CLICK "Convert"
-  Step 4: CLICK "Download"
+  Step 3: CLICK "Convert"  →  Step 4: CLICK "Download"
   ╭──── ✓ Done ──────────────────────╮
   │ Saved report.docx to Downloads.   │
   ╰───────────────────────────────────╯
@@ -80,21 +89,11 @@ ghost> Convert ~/Downloads/report.pdf to DOCX using an online converter
 
 ---
 
-## Why Ghost?
-
-Every other browser agent sends **screenshots to a vision model** for every action. Ghost reads the **DOM as text** — same information, 50x cheaper.
-
-![Cost Comparison](assets/cost_comparison.png)
-
-![Accuracy Comparison](assets/accuracy_comparison.png)
-
----
-
 ## How It Works
 
 ![How Ghost Works](assets/how_it_works.png)
 
-Ghost uses three perception layers — cheapest first:
+Three perception layers — cheapest first, smartest always:
 
 ![Perception Layers](assets/perception_layers.png)
 
@@ -109,22 +108,21 @@ DOM handles 90% of actions. VLM is the last resort, not the first.
 | Command | What it does |
 |---------|-------------|
 | `ghost` | Start Ghost |
-| `/help` | Show all commands |
-| `/loop [task]` | Repeat a task continuously, Ctrl+C to stop and get summary |
-| `/model [name]` | Switch LLM model (saved across sessions) |
+| `/loop [task]` | Repeat continuously, Ctrl+C to stop + summary |
+| `/model [name]` | Switch LLM (saved across sessions) |
 | `/config` | View/edit API key and settings |
-| `/memory` | Show what Ghost remembers |
-| `/tasks` | Show completed tasks |
-| `/tabs` | List open browser tabs |
-| `/screenshot` | Save current screen |
+| `/memory` | What Ghost remembers |
+| `/tasks` | Completed tasks |
+| `/tabs` | Open browser tabs |
+| `/help` | All commands |
 | `/quit` | Exit |
-| **[anything else]** | **Ghost executes it** |
+| **[anything else]** | **Ghost does it** |
 
 ---
 
 ## Loop Mode
 
-Run a task continuously until you stop it. Ghost summarizes everything when done.
+Run a task on repeat. Ghost finds new items each iteration. Ctrl+C for summary.
 
 ```
 ghost> /loop Search Upwork for Python jobs and apply to matching ones
@@ -144,65 +142,35 @@ ghost> /loop Search Upwork for Python jobs and apply to matching ones
   │ • Django REST API ($50-80/hr)             │
   │ • FastAPI microservice ($40-60/hr)        │
   ╰───────────────────────────────────────────╯
-  Summary saved to ~/ghost_loop_summary_20260327.md
+  Summary saved to ~/ghost_loop_summary.md
 ```
 
 ---
 
-## Use Any LLM
-
-Switch models on the fly — saved across sessions:
+## Any LLM. Your Choice.
 
 ```
-ghost> /model anthropic/claude-sonnet-4-6
-✓ Switched to claude-sonnet-4-6 (saved)
-
-ghost> /model openai/gpt-4o
-✓ Switched to gpt-4o (saved)
-
-ghost> /model google/gemini-2.5-flash
-✓ Switched to gemini-2.5-flash (saved)
-```
-
-Works with every model on [OpenRouter](https://openrouter.ai) — Claude, GPT, Gemini, Llama, and more.
-
----
-
-## Settings
-
-Ghost saves everything to `~/.ghost/config.json`. Edit anytime:
-
-```
-ghost> /config
-  API Key     sk-or-v1...fc283
-  Model       anthropic/claude-sonnet-4
-  Config      ~/.ghost/config.json
-
-ghost> /config key sk-or-v1-new-key-here
-✓ API key updated
-
-ghost> /config model openai/gpt-4.6
-✓ Model updated
+ghost> /model anthropic/claude-sonnet-4-6     # recommended
+ghost> /model openai/gpt-4.6                  # OpenAI latest
+ghost> /model google/gemini-3.1-pro           # Google latest
+ghost> /model google/gemini-2.5-flash         # cheapest
+ghost> /model meta-llama/llama-4-maverick     # open source
 ```
 
 ---
 
-## Memory
+## Memory & Task Replay
 
-Ghost remembers across sessions. No other browser agent does this.
+Ghost learns. First run costs $0.003. Repeat runs cost **$0.000**.
 
 ```
 ghost> /memory
 ┌─────────────────────────────────────────┐
-│ MEMORY.md                               │
-│                                         │
 │ - Upwork login uses Google OAuth        │
-│ - User prefers Claude Sonnet            │
 │ - GitHub trending is at /trending       │
+│ - CloudConvert is best for PDF→DOCX     │
 └─────────────────────────────────────────┘
 ```
-
-**Task Replay**: First run costs $0.003. Repeat runs cost $0.000.
 
 ---
 
@@ -219,21 +187,78 @@ ghost> /memory
 
 ---
 
-## Fresh Mac Setup
+## Settings
 
-```bash
-# 1. Install Ghost
-pip install ghostagent
+```
+ghost> /config
+  API Key     sk-or-v1...fc283
+  Model       anthropic/claude-sonnet-4
+  Config      ~/.ghost/config.json
 
-# 2. Run it (first time walks you through setup)
-ghost
-
-# 3. Grant Accessibility permission (one-time)
-#    System Settings → Privacy & Security → Accessibility
-#    Add your terminal app → Toggle ON
+ghost> /config key sk-or-v1-new-key
+ghost> /config model openai/gpt-4o
 ```
 
-That's it. Ghost auto-syncs your Chrome profile on first launch.
+---
+
+## Setup (Fresh Mac)
+
+```bash
+pip install ghostagent
+ghost
+# System Settings → Privacy & Security → Accessibility → Add terminal app → ON
+```
+
+Three steps. Ghost handles everything else.
+
+---
+
+<p align="center">
+  <img src="assets/logo.png" alt="Silver" width="80">
+</p>
+
+<h2 align="center">Introducing Silver Browser</h2>
+
+<p align="center">
+  <em>The browser built for AI. Open source. Coming soon.</em>
+</p>
+
+Ghost is powerful — but it's controlling someone else's browser. **What if the browser itself was built for AI from the ground up?**
+
+**Silver** is our open-source browser that ships with Ghost built in. No Chrome DevTools workarounds. No profile syncing hacks. The AI agent is part of the browser, not bolted on top.
+
+### What makes Silver different
+
+- **Ghost agent built-in** — talk to your browser, it does things
+- **Proprietary browser control model** — our own SOTA model for browser understanding, trained specifically for element grounding, page comprehension, and action planning
+- **Local inference** — run the model on your machine. Your data never leaves your device
+- **Cloud inference** — need speed? Use our cloud API. Same model, faster execution
+- **Privacy-first** — no telemetry, no screen recordings sent to third parties, no data collection
+- **Open source** — the browser is open. The model weights will be available for local use
+
+### The model
+
+We're building a **purpose-built browser control model** — not a general VLM repurposed for clicking buttons. Trained on millions of real browser interactions, optimized for:
+
+- **Element grounding**: given a task, find the exact element to interact with
+- **Page understanding**: know what a page is about from its structure, not pixels
+- **Action planning**: decompose multi-step tasks into reliable action sequences
+- **Cross-site generalization**: works on any website, not just ones it was trained on
+
+This will be **state-of-the-art for browser control** — benchmarked against Claude Computer Use, OpenAI Operator, and Browser Use. With privacy.
+
+### Why a new browser?
+
+Chrome, Firefox, Safari — they were built for humans. Silver is built for **humans + AI working together**. The AI doesn't fight the browser. It *is* the browser.
+
+> **Time to shift to a browser that's built in front of you. Exceptional performance. SOTA AI engine. Intelligence unbound.**
+
+---
+
+<p align="center">
+  <strong>Silver Browser + Ghost Agent</strong><br>
+  <em>Coming from <a href="https://github.com/rohitmenonhart-xhunter">Hitroo Labs</a></em>
+</p>
 
 ---
 
@@ -242,27 +267,25 @@ That's it. Ghost auto-syncs your Chrome profile on first launch.
 ```
 ghost/
 ├── cli.py                 # Terminal agent (the ghost command)
-├── config.py              # Persistent settings (~/.ghost/config.json)
+├── config.py              # Persistent settings
 ├── browser/
-│   ├── cdp.py             # Chrome DevTools — reads your real browser
+│   ├── cdp.py             # Chrome DevTools Protocol
 │   ├── agent.py           # AI + DOM automation
 │   └── tabs.py            # Multi-tab management
 ├── vision/
-│   ├── ocr.py             # RapidOCR — popups, dialogs, overlays
+│   ├── ocr.py             # RapidOCR
 │   ├── perceive.py        # DOM + OCR + VLM fusion
-│   └── vlm.py             # Vision LLM (fallback only)
+│   └── vlm.py             # Vision LLM fallback
 ├── agent/
-│   ├── apps.py            # Open/close/fullscreen apps
-│   ├── file_dialog.py     # Native file picker via OCR
+│   ├── apps.py            # App management
+│   ├── file_dialog.py     # File picker handling
 │   ├── clipboard.py       # Copy/paste
-│   ├── safety.py          # Confirm destructive actions
+│   ├── safety.py          # Safety rails
 │   └── recovery.py        # Error recovery
 └── memory/
-    ├── memory.py           # SOUL.md + episodic logs
-    └── replay.py           # Task replay library
+    ├── memory.py           # Persistent memory
+    └── replay.py           # Task replay
 ```
-
----
 
 ## Install from Source
 
@@ -279,8 +302,10 @@ Apache 2.0
 
 ## Contributing
 
-PRs welcome. Ghost is open source.
+PRs welcome. Ghost is open source and built for the community.
 
 ---
 
-Built by [Rohit Menon](https://github.com/rohitmenonhart-xhunter)
+<p align="center">
+  Built by <a href="https://github.com/rohitmenonhart-xhunter"><strong>Hitroo Labs</strong></a>
+</p>
