@@ -123,41 +123,7 @@ class BrowserController:
         # Determine profile directory
         if profile_dir is None:
             if SYSTEM == "Darwin":
-                # macOS workaround: Chrome won't allow CDP on default profile dir.
-                # Create a separate dir that copies cookies from the real profile.
-                real_profile = Path(CHROME_PROFILES["Darwin"])
-                ghost_profile = Path.home() / ".ghost" / "chrome-profile"
-                ghost_profile.mkdir(parents=True, exist_ok=True)
-
-                # Copy key files for login persistence (cookies, login data)
-                default_dir = real_profile / "Default"
-                ghost_default = ghost_profile / "Default"
-                ghost_default.mkdir(exist_ok=True)
-
-                for fname in ["Cookies", "Login Data", "Web Data", "Preferences",
-                              "Bookmarks", "Favicons", "History"]:
-                    src = default_dir / fname
-                    dst = ghost_default / fname
-                    if src.exists() and not dst.exists():
-                        try:
-                            import shutil
-                            shutil.copy2(src, dst)
-                        except Exception:
-                            pass
-
-                # Also copy Local State
-                local_state = real_profile / "Local State"
-                if local_state.exists():
-                    dst = ghost_profile / "Local State"
-                    if not dst.exists():
-                        try:
-                            import shutil
-                            shutil.copy2(local_state, dst)
-                        except Exception:
-                            pass
-
-                profile_dir = str(ghost_profile)
-                print(f"  [Browser] macOS: using ghost profile at {profile_dir}")
+                profile_dir = self._setup_macos_profile()
             else:
                 # Linux/Windows: use default profile directly — no conflicts
                 profile_dir = CHROME_PROFILES.get(SYSTEM, "")
@@ -178,6 +144,76 @@ class BrowserController:
             time.sleep(0.5)
 
         raise TimeoutError("Browser did not start with CDP in time.")
+
+    def _setup_macos_profile(self) -> str:
+        """macOS: Copy the user's real Chrome profile for Ghost to use.
+
+        Chrome on macOS won't allow CDP with the default profile directory.
+        Solution: copy the entire profile to ~/.ghost/chrome-profile.
+
+        Auto-refreshes if the real profile is newer than the ghost copy
+        (user signed into new accounts, changed settings, etc.)
+        """
+        import shutil
+
+        real_profile = Path(CHROME_PROFILES["Darwin"])
+        ghost_profile = Path.home() / ".ghost" / "chrome-profile"
+        sync_marker = ghost_profile / ".last_sync"
+
+        # Check if we need to sync
+        needs_sync = False
+
+        if not ghost_profile.exists():
+            needs_sync = True
+        elif not sync_marker.exists():
+            needs_sync = True
+        else:
+            # Refresh if real profile's key files changed since last sync
+            real_default = real_profile / "Default"
+            for check_file in ["Cookies", "Login Data", "Preferences"]:
+                real_file = real_default / check_file
+                ghost_file = ghost_profile / "Default" / check_file
+                if real_file.exists():
+                    if not ghost_file.exists():
+                        needs_sync = True
+                        break
+                    if real_file.stat().st_mtime > sync_marker.stat().st_mtime:
+                        needs_sync = True
+                        break
+
+        if needs_sync:
+            print("  [Browser] Syncing Chrome profile (cookies, logins, settings)...")
+
+            # Make sure Chrome is fully quit before copying
+            import subprocess as sp
+            sp.run(["pkill", "-f", "Google Chrome"], capture_output=True)
+            time.sleep(1)
+
+            # Copy entire Default profile
+            ghost_default = ghost_profile / "Default"
+            real_default = real_profile / "Default"
+
+            if real_default.exists():
+                # Remove old ghost default and copy fresh
+                if ghost_default.exists():
+                    shutil.rmtree(ghost_default, ignore_errors=True)
+                shutil.copytree(str(real_default), str(ghost_default), dirs_exist_ok=True)
+
+            # Copy Local State (encryption keys for cookies)
+            local_state_src = real_profile / "Local State"
+            if local_state_src.exists():
+                shutil.copy2(str(local_state_src), str(ghost_profile / "Local State"))
+
+            # Mark sync time
+            ghost_profile.mkdir(parents=True, exist_ok=True)
+            sync_marker.write_text(str(time.time()))
+
+            profile_size = sum(f.stat().st_size for f in ghost_profile.rglob("*") if f.is_file()) / 1e6
+            print(f"  [Browser] Profile synced ({profile_size:.0f}MB)")
+        else:
+            print("  [Browser] Profile up to date.")
+
+        return str(ghost_profile)
 
     def connect(self, tab_index: int = 0):
         """Connect to a browser tab."""
