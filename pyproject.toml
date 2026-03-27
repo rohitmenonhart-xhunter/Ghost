@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ghostagent"
-version = "0.2.0"
+version = "0.3.0"
 description = "AI browser agent that costs 50x less. DOM + OCR + Memory. Works with any LLM."
 readme = "README.md"
 license = {text = "Apache-2.0"}
