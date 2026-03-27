@@ -17,69 +17,72 @@
 
 ---
 
-## Install & Run
+## Get Started
 
 ```bash
 pip install ghostagent
-export OPENROUTER_API_KEY="your-key-here"
 ghost
 ```
 
+Ghost walks you through setup on first run — enter your API key once, grant permissions, and you're ready.
+
 ```
 ╔══════════════════════════════════════════╗
-║  👻 Ghost v0.2.0                         ║
+║  👻 Ghost v0.3.0                         ║
 ║  AI browser agent. DOM + OCR + Memory.   ║
-║  Type a task. Ghost does it.             ║
 ╚══════════════════════════════════════════╝
 
-  Permissions
-    ◉ Browser Control    Open, navigate, click, type in Chrome
-    ◉ Screen Reading     Capture screenshots, read text via OCR
-    ◉ File System        Read/write files, manage downloads
-    ◉ Clipboard          Read/write system clipboard
-    ◉ App Management     Open, close, switch applications
-    ◉ Keyboard/Mouse     Click, type, scroll, hotkeys
+  First-time Setup
+  Enter your OpenRouter API key: sk-or-v1-xxxxx
+  ✓ API key saved. You won't need to enter this again.
 
   Grant all permissions? [y/n]: y
-  ✓ All permissions granted.
   ✓ Ghost is ready.
+  Model: anthropic/claude-sonnet-4
 
-  ghost> Sign into Upwork with Google using rohit@gmail.com
-    Step 1: NAVIGATE upwork.com/login
-    Step 2: CLICK "Continue with Google"
-    Step 3: CLICK "rohit@gmail.com"
-    ✓ Signed into Upwork
-
-  ghost> Go to HackerNews and get the top 5 stories
-    ✓ 1. Why so many control rooms were seafoam green
-      2. Show HN: I built a search engine for RSS feeds
-      3. ...
-
-  ghost> Convert my PDF at ~/Downloads/report.pdf to DOCX
-    Step 1: NAVIGATE cloudconvert.com
-    Step 2: CLICK "Select File"
-    [DIALOG] File picker detected → Downloads → report.pdf → Open
-    Step 3: CLICK "Convert"
-    Step 4: CLICK "Download"
-    ✓ Saved report.docx to Downloads
-
-  ghost> /quit
-  👻 Ghost vanishes...
+  ghost> _
 ```
 
 ---
 
 ## What is Ghost?
 
-Ghost is a **terminal agent** — like Claude Code but for browser tasks. You type what you want, Ghost opens Chrome and does it on your real system with your real cookies, logins, and sessions.
+Ghost is a **terminal agent** that controls your browser. Type what you want in plain English, Ghost opens Chrome and does it — on your real system, with your real cookies, logins, and sessions.
 
-No sandboxed browser. No Playwright. No Selenium. Your actual Chrome.
+```
+ghost> Sign into Upwork with Google using rohit@gmail.com
+  Step 1: NAVIGATE upwork.com/login
+  Step 2: CLICK "Continue with Google"
+  Step 3: CLICK "rohit@gmail.com"
+  ╭──── ✓ Done ────╮
+  │ Signed in.      │
+  ╰─────────────────╯
+
+ghost> Get the top 5 trending repos on GitHub with star counts
+  ╭──── ✓ Done ────────────────────────────────────────╮
+  │ • bytedance/deer-flow — 49,092 ⭐                   │
+  │ • ruvnet/RuView — 43,386 ⭐                         │
+  │ • agentscope-ai/agentscope — 20,727 ⭐              │
+  │ • virattt/dexter — 19,147 ⭐                        │
+  │ • Yeachan-Heo/oh-my-claudecode — 13,001 ⭐          │
+  ╰─────────────────────────────────────────────────────╯
+
+ghost> Convert ~/Downloads/report.pdf to DOCX using an online converter
+  Step 1: NAVIGATE cloudconvert.com
+  Step 2: CLICK "Select File"
+  [DIALOG] File picker → Downloads → report.pdf → Open
+  Step 3: CLICK "Convert"
+  Step 4: CLICK "Download"
+  ╭──── ✓ Done ──────────────────────╮
+  │ Saved report.docx to Downloads.   │
+  ╰───────────────────────────────────╯
+```
 
 ---
 
 ## Why Ghost?
 
-Every other browser agent sends **screenshots to a vision model** for every action. Ghost reads the **DOM as text** — 50x cheaper, faster, more accurate.
+Every other browser agent sends **screenshots to a vision model** for every action. Ghost reads the **DOM as text** — same information, 50x cheaper.
 
 ![Cost Comparison](assets/cost_comparison.png)
 
@@ -91,17 +94,11 @@ Every other browser agent sends **screenshots to a vision model** for every acti
 
 ![How Ghost Works](assets/how_it_works.png)
 
-```
-Them:   Screenshot → Vision LLM ($$$) → guess pixel coordinates → click
-
-Ghost:  Read DOM as text → LLM picks element ID → exact click
-        + OCR catches popups, dialogs, overlays
-        + Memory replays known tasks at zero cost
-```
-
-### Three perception layers, cheapest first
+Ghost uses three perception layers — cheapest first:
 
 ![Perception Layers](assets/perception_layers.png)
+
+DOM handles 90% of actions. VLM is the last resort, not the first.
 
 ![Token Usage](assets/token_usage.png)
 
@@ -113,75 +110,86 @@ Ghost:  Read DOM as text → LLM picks element ID → exact click
 |---------|-------------|
 | `ghost` | Start Ghost |
 | `/help` | Show all commands |
-| `/model [name]` | Switch LLM (e.g., `/model openai/gpt-4o`) |
+| `/loop [task]` | Repeat a task continuously, Ctrl+C to stop and get summary |
+| `/model [name]` | Switch LLM model (saved across sessions) |
+| `/config` | View/edit API key and settings |
 | `/memory` | Show what Ghost remembers |
 | `/tasks` | Show completed tasks |
 | `/tabs` | List open browser tabs |
 | `/screenshot` | Save current screen |
 | `/quit` | Exit |
-| **[anything else]** | **Ghost executes it as a task** |
+| **[anything else]** | **Ghost executes it** |
 
 ---
 
-## Use any LLM
+## Loop Mode
 
-Switch models on the fly inside Ghost:
+Run a task continuously until you stop it. Ghost summarizes everything when done.
+
+```
+ghost> /loop Search Upwork for Python jobs and apply to matching ones
+
+  🔄 Loop Mode — Press Ctrl+C to stop
+
+  ── Iteration 1 ──
+  ✓ Applied to "Django REST API developer" ($50-80/hr)
+
+  ── Iteration 2 ──
+  ✓ Applied to "FastAPI microservice project" ($40-60/hr)
+
+  ^C
+
+  ╭──── 🔄 Loop Summary ─────────────────────╮
+  │ • Applied to 2 jobs in 3 minutes          │
+  │ • Django REST API ($50-80/hr)             │
+  │ • FastAPI microservice ($40-60/hr)        │
+  ╰───────────────────────────────────────────╯
+  Summary saved to ~/ghost_loop_summary_20260327.md
+```
+
+---
+
+## Use Any LLM
+
+Switch models on the fly — saved across sessions:
 
 ```
 ghost> /model anthropic/claude-sonnet-4-6
-✓ Switched to claude-sonnet-4-6
+✓ Switched to claude-sonnet-4-6 (saved)
 
-ghost> /model openai/gpt-4.6
-✓ Switched to gpt-4.6
-
-ghost> /model google/gemini-3.1-pro
-✓ Switched to gemini-3.1-pro
+ghost> /model openai/gpt-4o
+✓ Switched to gpt-4o (saved)
 
 ghost> /model google/gemini-2.5-flash
-✓ Switched to gemini-2.5-flash (cheapest)
+✓ Switched to gemini-2.5-flash (saved)
 ```
 
-Works with every model on [OpenRouter](https://openrouter.ai).
+Works with every model on [OpenRouter](https://openrouter.ai) — Claude, GPT, Gemini, Llama, and more.
 
 ---
 
-## What Ghost can do
+## Settings
 
-**Data extraction**
-```
-ghost> Go to Y Combinator's top companies and get the top 10 names
-```
+Ghost saves everything to `~/.ghost/config.json`. Edit anytime:
 
-**Form filling**
 ```
-ghost> Go to example.com/signup and fill: name=Rohit, email=rohit@example.com
-```
+ghost> /config
+  API Key     sk-or-v1...fc283
+  Model       anthropic/claude-sonnet-4
+  Config      ~/.ghost/config.json
 
-**Authenticated workflows** (uses your real Chrome cookies)
-```
-ghost> Go to my Gmail and find the latest email from Amazon
-```
+ghost> /config key sk-or-v1-new-key-here
+✓ API key updated
 
-**File uploads & downloads**
-```
-ghost> Upload ~/Downloads/report.pdf to ilovepdf.com, convert to DOCX, download it
-```
-
-**Google sign-in flows**
-```
-ghost> Sign into Upwork with Google using rohit@gmail.com
-```
-
-**Multi-step research**
-```
-ghost> Search Google for "best AI agents 2026", get top 5 results, save to ~/research.txt
+ghost> /config model openai/gpt-4.6
+✓ Model updated
 ```
 
 ---
 
 ## Memory
 
-Ghost remembers across sessions. Ask it something once, it never forgets.
+Ghost remembers across sessions. No other browser agent does this.
 
 ```
 ghost> /memory
@@ -189,12 +197,12 @@ ghost> /memory
 │ MEMORY.md                               │
 │                                         │
 │ - Upwork login uses Google OAuth        │
-│ - Safari icon is 5th in dock            │
-│ - User prefers Claude Sonnet 4.6        │
+│ - User prefers Claude Sonnet            │
+│ - GitHub trending is at /trending       │
 └─────────────────────────────────────────┘
 ```
 
-**Task Replay**: First time costs $0.003. Second time costs $0.000.
+**Task Replay**: First run costs $0.003. Repeat runs cost $0.000.
 
 ---
 
@@ -211,116 +219,52 @@ ghost> /memory
 
 ---
 
-## Permissions
+## Fresh Mac Setup
 
-When Ghost starts, it asks for permission to:
-
-| Permission | Why Ghost needs it |
-|-----------|-------------------|
-| **Browser Control** | Navigate, click, type in Chrome via DevTools Protocol |
-| **Screen Reading** | OCR for popups, dialogs, and overlays outside the DOM |
-| **File System** | Read/write files, handle downloads |
-| **Clipboard** | Copy/paste data between apps |
-| **App Management** | Open/close/fullscreen Chrome |
-| **Keyboard/Mouse** | Physical input when DOM clicks aren't enough |
-
-Ghost runs on **your machine**. Nothing is sent to any server except LLM API calls (your chosen provider).
-
----
-
-## Fresh Mac Setup (step by step)
-
-### 1. Install Python (if you don't have it)
 ```bash
-# Check if Python is installed
-python3 --version
-
-# If not, install via Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-brew install python
-```
-
-### 2. Install Chrome (if you don't have it)
-Download from [google.com/chrome](https://www.google.com/chrome/) and sign into your Google account.
-
-### 3. Install Ghost
-```bash
+# 1. Install Ghost
 pip install ghostagent
-```
 
-### 4. Run Ghost
-```bash
+# 2. Run it (first time walks you through setup)
 ghost
+
+# 3. Grant Accessibility permission (one-time)
+#    System Settings → Privacy & Security → Accessibility
+#    Add your terminal app → Toggle ON
 ```
 
-### 5. First-time setup (Ghost walks you through it)
-```
-╔══════════════════════════════════════════╗
-║  👻 Ghost v0.2.0                         ║
-╚══════════════════════════════════════════╝
-
-  First-time Setup
-
-  Ghost needs an API key to talk to AI models.
-  Get a free key at https://openrouter.ai
-
-  Enter your OpenRouter API key: sk-or-v1-xxxxx
-  ✓ API key saved. You won't need to enter this again.
-
-  Permissions
-    ◉ Browser Control
-    ◉ Screen Reading
-    ◉ File System
-    ◉ Clipboard
-    ◉ App Management
-    ◉ Keyboard/Mouse
-
-  Grant all permissions? [y/n]: y
-  ✓ Ghost is ready.
-
-  ghost> _
-```
-
-### 6. macOS permissions (one-time)
-Ghost needs Accessibility permission to control mouse/keyboard:
-1. Go to **System Settings → Privacy & Security → Accessibility**
-2. Add your terminal app (Terminal, iTerm2, or VS Code)
-3. Toggle it ON
-
-That's it. Ghost auto-syncs your Chrome profile (cookies, logins, everything).
+That's it. Ghost auto-syncs your Chrome profile on first launch.
 
 ---
 
-## Settings
-
-Ghost saves settings to `~/.ghost/config.json`. Edit anytime:
+## Architecture
 
 ```
-ghost> /config
-  API Key     sk-or-v1...fc283
-  Model       anthropic/claude-sonnet-4
-  Provider    openrouter
-  Config      ~/.ghost/config.json
-
-ghost> /config key sk-or-v1-your-new-key
-✓ API key updated
-
-ghost> /config model openai/gpt-4o
-✓ Model updated
-
-ghost> /model google/gemini-2.5-flash
-✓ Switched to gemini-2.5-flash (saved)
+ghost/
+├── cli.py                 # Terminal agent (the ghost command)
+├── config.py              # Persistent settings (~/.ghost/config.json)
+├── browser/
+│   ├── cdp.py             # Chrome DevTools — reads your real browser
+│   ├── agent.py           # AI + DOM automation
+│   └── tabs.py            # Multi-tab management
+├── vision/
+│   ├── ocr.py             # RapidOCR — popups, dialogs, overlays
+│   ├── perceive.py        # DOM + OCR + VLM fusion
+│   └── vlm.py             # Vision LLM (fallback only)
+├── agent/
+│   ├── apps.py            # Open/close/fullscreen apps
+│   ├── file_dialog.py     # Native file picker via OCR
+│   ├── clipboard.py       # Copy/paste
+│   ├── safety.py          # Confirm destructive actions
+│   └── recovery.py        # Error recovery
+└── memory/
+    ├── memory.py           # SOUL.md + episodic logs
+    └── replay.py           # Task replay library
 ```
 
 ---
 
-## Requirements
-
-- Python 3.10+
-- Google Chrome (signed in with your account)
-- [OpenRouter API key](https://openrouter.ai) — free to start, access to every AI model
-
-## Install from source
+## Install from Source
 
 ```bash
 git clone https://github.com/rohitmenonhart-xhunter/Ghost.git
@@ -332,6 +276,10 @@ ghost
 ## License
 
 Apache 2.0
+
+## Contributing
+
+PRs welcome. Ghost is open source.
 
 ---
 
