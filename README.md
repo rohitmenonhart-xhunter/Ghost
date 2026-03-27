@@ -228,11 +228,97 @@ Ghost runs on **your machine**. Nothing is sent to any server except LLM API cal
 
 ---
 
+## Fresh Mac Setup (step by step)
+
+### 1. Install Python (if you don't have it)
+```bash
+# Check if Python is installed
+python3 --version
+
+# If not, install via Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install python
+```
+
+### 2. Install Chrome (if you don't have it)
+Download from [google.com/chrome](https://www.google.com/chrome/) and sign into your Google account.
+
+### 3. Install Ghost
+```bash
+pip install ghostagent
+```
+
+### 4. Run Ghost
+```bash
+ghost
+```
+
+### 5. First-time setup (Ghost walks you through it)
+```
+╔══════════════════════════════════════════╗
+║  👻 Ghost v0.2.0                         ║
+╚══════════════════════════════════════════╝
+
+  First-time Setup
+
+  Ghost needs an API key to talk to AI models.
+  Get a free key at https://openrouter.ai
+
+  Enter your OpenRouter API key: sk-or-v1-xxxxx
+  ✓ API key saved. You won't need to enter this again.
+
+  Permissions
+    ◉ Browser Control
+    ◉ Screen Reading
+    ◉ File System
+    ◉ Clipboard
+    ◉ App Management
+    ◉ Keyboard/Mouse
+
+  Grant all permissions? [y/n]: y
+  ✓ Ghost is ready.
+
+  ghost> _
+```
+
+### 6. macOS permissions (one-time)
+Ghost needs Accessibility permission to control mouse/keyboard:
+1. Go to **System Settings → Privacy & Security → Accessibility**
+2. Add your terminal app (Terminal, iTerm2, or VS Code)
+3. Toggle it ON
+
+That's it. Ghost auto-syncs your Chrome profile (cookies, logins, everything).
+
+---
+
+## Settings
+
+Ghost saves settings to `~/.ghost/config.json`. Edit anytime:
+
+```
+ghost> /config
+  API Key     sk-or-v1...fc283
+  Model       anthropic/claude-sonnet-4
+  Provider    openrouter
+  Config      ~/.ghost/config.json
+
+ghost> /config key sk-or-v1-your-new-key
+✓ API key updated
+
+ghost> /config model openai/gpt-4o
+✓ Model updated
+
+ghost> /model google/gemini-2.5-flash
+✓ Switched to gemini-2.5-flash (saved)
+```
+
+---
+
 ## Requirements
 
 - Python 3.10+
-- Google Chrome
-- [OpenRouter API key](https://openrouter.ai) (free to start)
+- Google Chrome (signed in with your account)
+- [OpenRouter API key](https://openrouter.ai) — free to start, access to every AI model
 
 ## Install from source
 

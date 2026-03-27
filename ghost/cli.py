@@ -54,17 +54,40 @@ def main():
         padding=(1, 3),
     ))
 
-    # ── Permission Check ─────────────────────────────────────
-    api_key = os.environ.get("OPENROUTER_API_KEY", "")
+    # ── API Key Setup ─────────────────────────────────────────
+    from ghost.config import load_config, save_config, get_api_key, set_api_key, get_model, set_model
+
+    config = load_config()
+    api_key = get_api_key()
 
     if not api_key:
+        # First-time setup
         console.print()
-        console.print("[bold red]  No API key found.[/bold red]")
-        console.print("  Set your OpenRouter key:")
-        console.print("  [dim]export OPENROUTER_API_KEY=\"your-key-here\"[/dim]")
-        console.print("  Get one free at [link=https://openrouter.ai]openrouter.ai[/link]")
+        console.print("[bold bright_red]  First-time Setup[/bold bright_red]")
         console.print()
-        return
+        console.print("  Ghost needs an API key to talk to AI models.")
+        console.print("  Get a free key at [bold]https://openrouter.ai[/bold]")
+        console.print()
+
+        try:
+            api_key = Prompt.ask("  [bold]Enter your OpenRouter API key[/bold]")
+        except (EOFError, KeyboardInterrupt):
+            console.print("\n  [dim]Bye.[/dim]")
+            return
+
+        api_key = api_key.strip()
+        if not api_key:
+            console.print("  [red]No key entered. Exiting.[/red]")
+            return
+
+        # Save it so they never have to enter it again
+        set_api_key(api_key)
+        console.print("  [green]✓ API key saved to ~/.ghost/config.json[/green]")
+        console.print("  [dim]You won't need to enter this again.[/dim]")
+    else:
+        # Key exists — show masked version
+        masked = api_key[:8] + "..." + api_key[-4:]
+        console.print(f"  [dim]API key: {masked}[/dim]")
 
     # ── Permissions ───────────────────────────────────────────
     console.print()
@@ -126,19 +149,20 @@ def main():
         clipboard = Clipboard()
         memory = GhostMemory()
 
+        current_model = get_model()
         agent = BrowserAgent(
             provider="openrouter",
-            model="anthropic/claude-sonnet-4",
+            model=current_model,
             api_key=api_key,
         )
 
     console.print("  [green]✓ Ghost is ready.[/green]")
+    console.print(f"  [dim]Model: {current_model}[/dim]")
     console.print()
-    console.print("  [dim]Commands: /help /loop /model /memory /tasks /quit[/dim]")
+    console.print("  [dim]Commands: /help /loop /model /config /memory /tasks /quit[/dim]")
     console.print()
 
     # ── Model state ───────────────────────────────────────────
-    current_model = "anthropic/claude-sonnet-4"
     task_count = 0
 
     # ── REPL Loop ─────────────────────────────────────────────
@@ -167,7 +191,8 @@ def main():
             help_table.add_column("Description", style="dim")
             help_table.add_row("  /help", "Show this help")
             help_table.add_row("  /loop [task]", "Repeat a task until Ctrl+C, then summarize")
-            help_table.add_row("  /model [name]", "Switch LLM model")
+            help_table.add_row("  /model [name]", "Switch LLM model (saved across sessions)")
+            help_table.add_row("  /config", "View/edit API key and settings")
             help_table.add_row("  /memory", "Show what Ghost remembers")
             help_table.add_row("  /tasks", "Show completed tasks")
             help_table.add_row("  /tabs", "List open browser tabs")
@@ -183,15 +208,56 @@ def main():
             parts = user_input.split(None, 1)
             if len(parts) > 1:
                 current_model = parts[1].strip()
+                set_model(current_model)
                 agent = BrowserAgent(
                     provider="openrouter",
                     model=current_model,
                     api_key=api_key,
                 )
-                console.print(f"  [green]✓ Switched to {current_model}[/green]")
+                console.print(f"  [green]✓ Switched to {current_model} (saved)[/green]")
             else:
                 console.print(f"  [white]Current model: {current_model}[/white]")
                 console.print("  [dim]Usage: /model anthropic/claude-sonnet-4-6[/dim]")
+                console.print("  [dim]Popular models:[/dim]")
+                console.print("  [dim]  anthropic/claude-sonnet-4-6  (recommended)[/dim]")
+                console.print("  [dim]  openai/gpt-4o               (fast)[/dim]")
+                console.print("  [dim]  google/gemini-2.5-flash      (cheapest)[/dim]")
+            continue
+
+        elif user_input.lower().startswith("/config"):
+            parts = user_input.split(None, 1)
+            if len(parts) > 1 and parts[1].strip():
+                # /config key <value>
+                sub = parts[1].strip()
+                if sub.startswith("key "):
+                    new_key = sub[4:].strip()
+                    set_api_key(new_key)
+                    api_key = new_key
+                    agent = BrowserAgent(provider="openrouter", model=current_model, api_key=api_key)
+                    masked = new_key[:8] + "..." + new_key[-4:]
+                    console.print(f"  [green]✓ API key updated: {masked}[/green]")
+                elif sub.startswith("model "):
+                    new_model = sub[6:].strip()
+                    current_model = new_model
+                    set_model(new_model)
+                    agent = BrowserAgent(provider="openrouter", model=current_model, api_key=api_key)
+                    console.print(f"  [green]✓ Model updated: {new_model}[/green]")
+                else:
+                    console.print(f"  [dim]Unknown config: {sub}[/dim]")
+            else:
+                # Show current config
+                masked = api_key[:8] + "..." + api_key[-4:] if len(api_key) > 12 else "not set"
+                console.print()
+                config_table = Table(show_header=False, box=box.SIMPLE, padding=(0, 2))
+                config_table.add_column("Setting", style="bold white")
+                config_table.add_column("Value", style="white")
+                config_table.add_row("  API Key", masked)
+                config_table.add_row("  Model", current_model)
+                config_table.add_row("  Provider", "openrouter")
+                config_table.add_row("  Config file", str(Path.home() / ".ghost" / "config.json"))
+                console.print(config_table)
+                console.print()
+                console.print("  [dim]Edit: /config key <api-key> | /config model <model-name>[/dim]")
             continue
 
         elif user_input.lower() == "/memory":
