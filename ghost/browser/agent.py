@@ -96,15 +96,16 @@ class BrowserAgent:
                 title = self.browser.get_page_title()
                 elements = self.browser.get_interactive_elements()
                 element_list = self.browser.format_elements_for_vlm(elements)
-                page_text = self.browser.get_page_text()[:2000]
+                page_text = self.browser.get_page_text()[:4000]
+                scroll_info = self.browser.get_scroll_position()
+                can_scroll = scroll_info.get("scrollY", 0) + scroll_info.get("viewportHeight", 0) < scroll_info.get("scrollHeight", 0)
             except Exception:
-                # DOM might be unavailable (dialog open, page loading, etc.)
-                # Fall back to OCR + accessibility
                 url = "unknown"
                 title = "unknown"
                 elements = []
                 element_list = "DOM unavailable — page may be loading or a dialog is open"
                 page_text = ""
+                can_scroll = False
 
             # 2. Ask AI what to do next
             history_str = "\n".join(f"  Step {i+1}: {h}" for i, h in enumerate(history[-8:]))
@@ -116,12 +117,13 @@ TASK: {task}
 CURRENT STATE:
   URL: {url}
   Title: {title}
+  Scroll: {"MORE CONTENT BELOW — use SCROLL down to see it" if can_scroll else "At bottom of page"}
 
 INTERACTIVE ELEMENTS:
 {element_list}
 
-PAGE TEXT (first 2000 chars):
-{page_text[:1000]}
+PAGE TEXT:
+{page_text[:2000]}
 
 {"HISTORY:" + chr(10) + history_str if history else "This is the first step."}
 
@@ -129,7 +131,7 @@ AVAILABLE ACTIONS (pick ONE):
   CLICK [id]              — click element by ID number
   FILL [id] [text]        — type text into an input field
   NAVIGATE [url]          — go to a URL
-  SCROLL [up/down]        — scroll the page
+  SCROLL [up/down]        — scroll the page to reveal more content
   PRESS [key]             — press a key (enter, tab, escape)
   READ                    — read more page content (for gathering info)
   UPLOAD [filepath]       — upload a file (handles the native file dialog automatically)
@@ -137,6 +139,9 @@ AVAILABLE ACTIONS (pick ONE):
 
 RULES:
   - Pick the SIMPLEST action that makes progress
+  - IMPORTANT: If the task asks for N items and you only have fewer than N, SCROLL down to find more before using DONE
+  - IMPORTANT: Before using DONE, verify you have ALL the data the user asked for. If not, SCROLL or READ first.
+  - When using DONE, include the COMPLETE answer with ALL requested data in the result text.
   - For file uploads: first CLICK the upload/choose-file button, then use UPLOAD [filepath]
   - For sign-in flows: click the right button, fill fields, press enter
   - When gathering info: use READ to get page content, then DONE with the answer
@@ -147,7 +152,7 @@ REASONING: <brief explanation>
 ACTION: <one action from above>"""
 
             print(f"  Step {step}: ", end="", flush=True)
-            response = self._ask_llm(prompt, max_tokens=300)
+            response = self._ask_llm(prompt, max_tokens=600)
 
             # 3. Parse the action
             action = self._parse_action(response)
