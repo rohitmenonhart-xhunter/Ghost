@@ -5,8 +5,8 @@
 <h1 align="center">Ghost</h1>
 
 <p align="center">
-  <strong>AI browser agent that controls your computer.</strong><br>
-  Type a task. Ghost does it. DOM + OCR + Memory.
+  <strong>AI browser agent that saves you time and money.</strong><br>
+  Type a task. Ghost does it.
 </p>
 
 <p align="center">
@@ -225,7 +225,7 @@ Three steps. Ghost handles everything else.
 
 Ghost is powerful — but it's controlling someone else's browser. **What if the browser itself was built for AI from the ground up?**
 
-**Silver** is our open-source browser that ships with Ghost built in. No Chrome DevTools workarounds. No profile syncing hacks. The AI agent is part of the browser, not bolted on top.
+**Silver** is our open-source browser that ships with Ghost built in.The AI agent is part of the browser, not bolted on top.
 
 ### What makes Silver different
 
@@ -257,7 +257,7 @@ Chrome, Firefox, Safari — they were built for humans. Silver is built for **hu
 
 <p align="center">
   <strong>Silver Browser + Ghost Agent</strong><br>
-  <em>Coming from <a href="https://github.com/rohitmenonhart-xhunter">Hitroo Labs</a></em>
+  <em>Coming from <a href="https://hitroo.com">Hitroo Labs</a></em>
 </p>
 
 ---
